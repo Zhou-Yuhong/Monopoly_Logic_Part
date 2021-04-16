@@ -57,7 +57,7 @@ public class PlayerModel implements GamePort{
      * 玩家编号,显示房屋图片使用
      *
      */
-    private int number = 0;
+    private int number =0;
 
     /**
      *
@@ -92,7 +92,7 @@ public class PlayerModel implements GamePort{
      * 对方玩家
      *
      */
-    private PlayerModel otherPlayer = null;
+    private List<PlayerModel> allplayers = null;
     /**
      *
      * 游戏控制器
@@ -130,12 +130,17 @@ public class PlayerModel implements GamePort{
         this.inPrison = inPrison;
     }
 
-    public PlayerModel getOtherPlayer() {
-        return otherPlayer;
+    public PlayerModel getnextplayer(){
+        if(this.number==4){
+            return this.allplayers.get(0);
+        }
+        else{
+            return this.allplayers.get(this.number);
+        }
     }
 
-    public void setOtherPlayer(PlayerModel otherPlayer) {
-        this.otherPlayer = otherPlayer;
+    public void setAllplayers(List<PlayerModel> allplayers) {
+        this.allplayers=allplayers;
     }
 
     public int getNumber() {

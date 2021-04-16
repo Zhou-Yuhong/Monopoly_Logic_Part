@@ -85,7 +85,7 @@ public class GameRunning {
      * 初始化玩家初始金钱
      *
      */
-    public static int PLAYER_CASH = 1000;
+    public static int PLAYER_CASH = 4000;
 
     private Control control;
 
@@ -161,12 +161,11 @@ public class GameRunning {
 
     /**
      *
-     * 获取非当前玩家
+     * 获取下个玩家
      *
      */
-    public PlayerModel getNotNowPlayer() {
-        return this.nowPlayer.equals(this.players.get(0)) ? this.players.get(1)
-                : this.players.get(0);
+    public PlayerModel getNextPlayer() {
+        return this.nowPlayer.getnextplayer();
     }
 
     /**
@@ -181,12 +180,12 @@ public class GameRunning {
             this.nowPlayer.setInHospital(this.nowPlayer.getInHospital() - 1);
         }
         // 换人
-        if (this.nowPlayer.equals(this.players.get(0))) {
-            this.nowPlayer = this.players.get(1);
-        } else {
+        if (this.nowPlayer.equals(this.players.get(this.players.size()-1))) {
             this.nowPlayer = this.players.get(0);
-            // 结束后游戏天数增加
+            //一轮后游戏天数增加
             day++;
+        } else {
+            this.nowPlayer = this.nowPlayer.getnextplayer();
         }
     }
 
@@ -197,27 +196,31 @@ public class GameRunning {
      *
      */
     public boolean gameContinue() {
-        PlayerModel p1 = this.nowPlayer;
-        PlayerModel p2 = this.nowPlayer.getOtherPlayer();
         // 天数
         if (GAME_DAY > 0 && day >= GAME_DAY) {
             this.control.gameOver();
+            //提示
+            System.out.println("游戏结束");
             return false;
         }
         // 最大金钱
-        if (MONEY_MAX > 0 && p1.getCash() >= MONEY_MAX) {
-            this.control.gameOver();
-            return false;
-        } else if (MONEY_MAX > 0 && p2.getCash() >= MONEY_MAX) {
-            this.control.gameOver();
-            return false;
-        }
+         for(int i=0;i<players.size();i++){
+             if(MONEY_MAX>0&&players.get(i).getCash()>=MONEY_MAX){
+              this.control.gameOver();
+              System.out.println("游戏结束");
+              return false;
+             }
+         }
         // 破产
-        if (p1.getCash() < 0) {
+        for (int i=0;i<players.size();i++){
+            if(players.get(i).getCash()<0){
+                System.out.println(players.get(i).getName()+"破产淘汰");
+                players.remove(i);
+            }
+        }
+        if(players.size()==1) {
             this.control.gameOver();
-            return false;
-        } else if (p2.getCash() < 0) {
-            this.control.gameOver();
+            System.out.println("游戏结束,玩家"+players.get(0).getName()+"获胜");
             return false;
         }
         return true;
@@ -237,6 +240,9 @@ public class GameRunning {
 
     public int getDay() {
         return day;
+    }
+    public List<PlayerModel> getPlayers(){
+        return this.players;
     }
 
     /**

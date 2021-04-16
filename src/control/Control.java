@@ -85,8 +85,16 @@ import java.util.List;
         this.players = new ArrayList<PlayerModel>();
         this.players.add(new PlayerModel(1, this));
         this.players.add(new PlayerModel(2, this));
+        this.players.add(new PlayerModel(3, this));
+        this.players.add(new PlayerModel(4, this));
+        //初始化每个玩家内置的所有玩家指针
+        for(int i=0;i<this.players.size();i++){
+            this.players.get(i).setAllplayers(players);
+        }
         this.models.add(players.get(0));
         this.models.add(players.get(1));
+        this.models.add(players.get(2));
+        this.models.add(players.get(3));
         // 创建一个新的骰子模型
         this.dice = new DiceModel(run);
         this.models.add(dice);
@@ -117,8 +125,22 @@ import java.util.List;
         catch (IOException e){
             System.out.print(e);
         }
-        this.players.get(0).setOtherPlayer(this.players.get(1));
-        this.players.get(1).setOtherPlayer(this.players.get(0));
+        this.textTip.showTextTip(null,"请输入玩家3姓名");
+        try{
+            nameinput=reader.readLine();
+            this.players.get(2).setName(nameinput);
+        }
+        catch (IOException e){
+            System.out.print(e);
+        }
+        this.textTip.showTextTip(null,"请输入玩家4姓名");
+        try{
+            nameinput=reader.readLine();
+            this.players.get(3).setName(nameinput);
+        }
+        catch (IOException e){
+            System.out.print(e);
+        }
         // 刷新对象初始数据
         for (GamePort temp : this.models) {
             temp.startGameInit();
@@ -178,18 +200,19 @@ import java.util.List;
             this.run.nextState();  //由掷骰子状态转到移动
             if(player.getInHospital()>0){
                 this.textTip.showTextTip(player,player.getName()+"住院中,不能掷骰子");
-                player.setInHospital(player.getInHospital()-1);//住院天数减一
+                //player.setInHospital(player.getInHospital()-1);
 
             }else if(player.getInPrison()>0){
                 this.textTip.showTextTip(player,player.getName()+"在监狱中，不能掷骰子");
-                player.setInPrison(player.getInPrison()-1);//监狱天数减一
+               // player.setInPrison(player.getInPrison()-1);
             }
             this.run.nextState();//由移动状态转到换人
         }
         else{
-            this.textTip.showTextTip(player,"请输入骰子点数");
+            this.textTip.showTextTip(player,"轮到"+player.getName()+"请输入骰子点数");
           try{
-          int result=Integer.parseInt(reader.readLine());
+              String ss=reader.readLine();
+          int result=Integer.parseInt(ss);
           handleDicenum(result);}
           catch(IOException e){
               System.out.print(e);
@@ -239,23 +262,23 @@ import java.util.List;
     public void movePlayer(){
         //移动玩家,直接使用MAP3，
         PlayerModel player=this.run.getNowPlayer();
-        if(player.getY()==0&&player.getX()!=GameState.ROW_NUM-1){
-            player.setX(player.getX()+1);
-            this.passedBuilding.add(this.building.getBuilding(player.getX(),player.getY()));
-            return;
-        }
-        if(player.getY()==0&&player.getX()==GameState.ROW_NUM-1){
-            player.setY(1);
-            this.passedBuilding.add(this.building.getBuilding(player.getX(),player.getY()));
-            return;
-        }
-        if(player.getY()==GameState.ROW_NUM-1&&player.getX()!=GameState.LINE_NUM-1){
+        if(player.getX()==0&&player.getY()!=GameState.ROW_NUM-1){
             player.setY(player.getY()+1);
             this.passedBuilding.add(this.building.getBuilding(player.getX(),player.getY()));
             return;
         }
+        if(player.getX()==0&&player.getY()==GameState.ROW_NUM-1){
+            player.setX(1);
+            this.passedBuilding.add(this.building.getBuilding(player.getX(),player.getY()));
+            return;
+        }
+        if(player.getY()==GameState.ROW_NUM-1&&player.getX()!=GameState.LINE_NUM-1){
+            player.setX(player.getX()+1);
+            this.passedBuilding.add(this.building.getBuilding(player.getX(),player.getY()));
+            return;
+        }
         if(player.getY()==GameState.ROW_NUM-1&&player.getX()==GameState.LINE_NUM-1){
-            player.setX(player.getX()-1);
+            player.setY(player.getY()-1);
             this.passedBuilding.add(this.building.getBuilding(player.getX(),player.getY()));
             return;
         }
@@ -265,6 +288,11 @@ import java.util.List;
             return;
         }
         if(player.getX()==GameState.LINE_NUM-1&& player.getY()==0){
+            player.setX(player.getX()-1);
+            this.passedBuilding.add(this.building.getBuilding(player.getX(),player.getY()));
+            return;
+        }
+        if(player.getY()==0){
             player.setX(player.getX()-1);
             this.passedBuilding.add(this.building.getBuilding(player.getX(),player.getY()));
             return;
@@ -625,6 +653,7 @@ import java.util.List;
 
            try{
                flag=(char)reader.read();
+               String tmp=reader.readLine();
            }
            catch(IOException e){
                System.out.print(e);
@@ -664,6 +693,7 @@ import java.util.List;
 
         try{
             flag=(char)reader.read();
+            String tmp=reader.readLine();
         }
         catch(IOException e){
             System.out.print(e);
