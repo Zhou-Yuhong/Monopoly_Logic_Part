@@ -16,9 +16,15 @@ public class ControlDiceCard extends Card{
         this.cName = "遥控骰子卡";
         this.price = 30;
     }
-
+    private int dicenum=0;  //需要遥控的点数
     @Override
     public int useCard() {
         return GameState.CARD_CONTROLDICE;
+    }
+    public int getDicenum(){
+        return this.dicenum;
+    }
+    public void setDicenum(int num){
+        this.dicenum=num;
     }
 }

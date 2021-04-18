@@ -2,6 +2,8 @@ package model;
 
 import java.awt.*;
 import control.GameRunning;
+import model.buildings.Hospital;
+
 public class LandModel implements GamePort{
     /**
      * 空地
@@ -52,12 +54,16 @@ public class LandModel implements GamePort{
      */
     public final static int NULL_SET = 0;
     /**
-     * 医院信息
+     * 医院坐标，使用land3
      */
-    public static Point hospital = new Point(0, 0);
+
+    public static int Hospital_x=7;
+    public static int Hospital_y=8;
     /**
-     * 监狱信息
+     * 监狱坐标，使用land3
      */
+    public static int Prison_x=0;
+    public static int Prison_y=7;
     public static Point prison = new Point(0, 0);
     public LandModel(){ }
 

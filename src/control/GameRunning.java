@@ -1,7 +1,10 @@
 package control;
 import model.PlayerModel;
+import model.buildings.Building;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 /**
  *
@@ -20,6 +23,10 @@ public class GameRunning {
      */
     private PlayerModel nowPlayer = null;
 
+    /**
+    * 当前玩家经过的建筑
+    */
+    private List<Building> passedBuildings=null;
     /**
      * 骰子当前点数
      */
@@ -53,6 +60,8 @@ public class GameRunning {
      *
      */
     private int nowPlayerState;
+
+
 
     /**
      *
@@ -90,6 +99,7 @@ public class GameRunning {
     private Control control;
 
     public GameRunning(Control control, List<PlayerModel> players) {
+        this.passedBuildings=new ArrayList<>();
         this.control = control;
         this.players = players;
     }
@@ -101,6 +111,13 @@ public class GameRunning {
      */
     public int getNowPlayerState() {
         return this.nowPlayerState;
+    }
+    /**
+     * passedBuilding的外部接口
+     *
+    * */
+    public List<Building> getpassdeBuilding(){
+        return this.passedBuildings;
     }
 
     /**
@@ -135,13 +152,17 @@ public class GameRunning {
 //    }
        public void nextState(){
            if(gameContinue()){
-               if(this.nowPlayerState==STATE_CARD){
+               if(this.nowPlayerState==STATE_THROWDICE){
                    //若当前是“掷点状态”，则接下来进入移动状态
                    this.nowPlayerState=STATE_MOVE;
                }
                else if(this.nowPlayerState==STATE_MOVE){
-                   //若现在的状态是”移动状态“，则接下来会换人并进入掷点状态
+                   //若现在的状态是”移动状态“，则接下来会进入卡片使用状态
                    this.nowPlayerState=STATE_CARD;
+               }
+               else if(this.nowPlayerState==STATE_CARD){
+                   //若现在的状态是使用卡片状态，则接下来换人且进入掷骰子状态
+                   this.nowPlayerState=STATE_THROWDICE;
                    this.nextPlayer();
                }
            }
@@ -159,14 +180,6 @@ public class GameRunning {
         this.nowPlayerState = nowPlayerState;
     }
 
-    /**
-     *
-     * 获取下个玩家
-     *
-     */
-    public PlayerModel getNextPlayer() {
-        return this.nowPlayer.getnextplayer();
-    }
 
     /**
      * 换人操作
@@ -244,6 +257,14 @@ public class GameRunning {
     public List<PlayerModel> getPlayers(){
         return this.players;
     }
+    public PlayerModel getplayerWithnum(int num){
+        for(int i=0;i<this.players.size();i++){
+            if(this.players.get(i).getNumber()==num){
+                return this.players.get(i);
+            }
+        }
+        return null;
+    }
 
     /**
      *
@@ -253,9 +274,8 @@ public class GameRunning {
     public void startGameInit() {
         // 设定当前游戏玩家
         this.nowPlayer = this.players.get(0);
-        // 设定当前玩家状态为“使用卡片”
-        this.nowPlayerState = STATE_CARD;
-        // 首个玩家使用卡片
-        //this.control.useCards();
+        // 设定当前玩家状态为“掷骰子”
+        this.nowPlayerState = STATE_THROWDICE;
+
     }
 }

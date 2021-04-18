@@ -1,11 +1,12 @@
 package model;
 import model.buildings.Building;
-import model.card.Card;
+import model.card.*;
 import control.Control;
 import control.GameRunning;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * 玩家信息
@@ -85,11 +86,11 @@ public class PlayerModel implements GamePort{
      * 附加身上的EFFECT 卡片
      *
      */
-    private List<Card> effectCards = new ArrayList<Card>();
+    private Stack<Card> effectCards=new Stack<Card>();
 
     /**
      *
-     * 对方玩家
+     * 所有玩家
      *
      */
     private List<PlayerModel> allplayers = null;
@@ -114,7 +115,7 @@ public class PlayerModel implements GamePort{
         this.cards = cards;
     }
 
-    public List<Card> getEffectCards() {
+    public Stack<Card> getEffectCards() {
         return effectCards;
     }
 
@@ -131,12 +132,18 @@ public class PlayerModel implements GamePort{
     }
 
     public PlayerModel getnextplayer(){
-        if(this.number==4){
-            return this.allplayers.get(0);
-        }
-        else{
-            return this.allplayers.get(this.number);
-        }
+       int size=this.allplayers.size();
+       if(this.number==allplayers.get(size-1).getNumber()){
+           return allplayers.get(0);
+       }
+       else{
+           for(int i=0;i<size;i++){
+               if(this.number==allplayers.get(i).getNumber()){
+                   return allplayers.get(i+1);
+               }
+           }
+       }
+       return null;
     }
 
     public void setAllplayers(List<PlayerModel> allplayers) {
@@ -202,9 +209,15 @@ public class PlayerModel implements GamePort{
     public void setY(int y) {
         this.y = y;
     }
-
-    public void debug() {
-        System.out.println("玩家:" + name + ",坐标：[" + x + "," + y + "].");
+    public void addEffecCard(Card card){
+        this.effectCards.push(card);
+    }
+    public Card getEffectCard(){
+        Card card=this.effectCards.pop();
+        return card;
+    }
+    public boolean IfEffectCardsEmpty(){
+        return this.effectCards.empty();
     }
 
     /**
@@ -216,5 +229,50 @@ public class PlayerModel implements GamePort{
 
         // 初始化玩家金钱
         this.cash = GameRunning.PLAYER_CASH;
+        //给每个玩家随机发两张道具卡
+        for(int i=0;i<2;i++){
+            int num=(int)(Math.random()*13);
+            switch(num){
+                case 0:
+                case 1:
+                    this.getCards().add(new AddLevelCard(this));
+                    break;
+                case 2:
+                    this.getCards().add(new AveragerPoorCard(this));
+                    break;
+                case 3:
+                    this.getCards().add(new ChangeCard(this));
+                    break;
+                case 4:
+                    this.getCards().add(new ControlDiceCard(this));
+                    break;
+                case 5:
+                    this.getCards().add(new CrossingCard(this));
+                    break;
+                case 6:
+                    this.getCards().add(new HaveCard(this));
+                    break;
+                case 7:
+                    this.getCards().add(new ReduceLevelCard(this));
+                    break;
+                case 8:
+                    this.getCards().add(new RobCard(this));
+                    break;
+                case 9:
+                    this.getCards().add(new TallageCard(this));
+                    break;
+                case 10:
+                    this.getCards().add(new TortoiseCard(this));
+                    break;
+                case 11:
+                    this.getCards().add(new TrapCard(this));
+                    break;
+                case 12:
+                    this.getCards().add(new StopCard(this));
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 }
