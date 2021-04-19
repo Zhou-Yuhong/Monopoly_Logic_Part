@@ -81,9 +81,9 @@ public abstract class Card {
     }
 
 
-    public PlayerModel geteOwner() {
-        return eOwner;
-    }
+//    public PlayerModel geteOwner() {
+//        return eOwner;
+//    }
 
     public void seteOwner(PlayerModel eOwner) {
         this.eOwner = eOwner;

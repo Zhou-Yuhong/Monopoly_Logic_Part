@@ -64,16 +64,6 @@ import java.util.List;
      *
      */
     private void initClass() {
-        // 创建一个新的事件模型
-       // this.events = new EventsModel();
-       // this.models.add(events);
-        // 创建一个新的场景效果模型
-       // this.effect = new EffectModel();
-      //  this.models.add(effect);
-        // 创建新的背景模型
-       // this.background = new BackgroundModel();
-      //  this.models.add(background);
-        // 创建新的土地模型
         this.land = new LandModel();
         this.models.add(land);
         // 创建新的文本显示模型
@@ -227,15 +217,18 @@ import java.util.List;
             else{
                 Card card=player.getEffectCard();
                 if(card.useCard()==GameState.CARD_TORTOISE){
+                    this.textTip.showTextTip(null,"受乌龟卡影响,"+player.getName()+"移动一步");
                     handleDicenum(1);
                     return;
                 }
                 if(card.useCard()==GameState.CARD_STOP){
+                    this.textTip.showTextTip(null,"受停留卡影响"+player.getName()+"停留在原位置");
                     handleDicenum(0);
                     return;
                 }
                 if(card.useCard()==GameState.CARD_CONTROLDICE){
                     ControlDiceCard tmp=(ControlDiceCard) card;
+                    this.textTip.showTextTip(null,player.getName()+"使用的遥控骰子卡生效，移动"+tmp.getDicenum()+"步");
                     handleDicenum(tmp.getDicenum());
                     return;
                 }
@@ -862,13 +855,9 @@ import java.util.List;
      * 使用嫁祸卡
      *
      */
-    private void useCrossingCard(Card card) {
-//        Object[] options1 = { "重新选择" };
-//        JOptionPane.showOptionDialog(null, " 嫁祸卡在大事件发生时会自动使用.",
-//                "卡片使用阶段.", JOptionPane.YES_OPTION,
-//                JOptionPane.PLAIN_MESSAGE, null, options1,
-//                options1[0]);
+    private void useCrossingCard(Card card) { ;
         this.textTip.showTextTip(null,"嫁祸卡使用成功，嫁祸卡会在大事件发生的时候自动使用");
+        return;
     }
     /**
      *
@@ -876,10 +865,9 @@ import java.util.List;
      *
      */
     private void useTrapCard(Card card) {
-        this.textTip.showTextTip(null,card.geteOwner().getName()+" ,请选择你要陷害的玩家编号");
+        this.textTip.showTextTip(null,card.getOwner().getName()+" ,请选择你要陷害的玩家编号");
         try {
-            int num = reader.read();
-            reader.readLine();
+            int num=Integer.parseInt(reader.readLine());
             PlayerModel target=this.run.getplayerWithnum(num);
             if(target==null) {
                 this.textTip.showTextTip(null,"该玩家不存在");
@@ -892,8 +880,8 @@ import java.util.List;
                 target.setX(LandModel.Prison_x);
                 target.setY(LandModel.Prison_y);
                 //文本提示
-                this.textTip.showTextTip(card.geteOwner(),card.geteOwner().getName()+"使用了陷害卡，使"+target.getName()+"入狱两天");
-                card.geteOwner().getCards().remove(card);
+                this.textTip.showTextTip(card.getOwner(),card.getOwner().getName()+"使用了陷害卡，使"+target.getName()+"入狱两天");
+                card.getOwner().getCards().remove(card);
             }
         }
         catch (IOException e){
@@ -907,10 +895,9 @@ import java.util.List;
      *
      */
     private void useTortoiseCard(Card card) {
-        this.textTip.showTextTip(card.geteOwner(),card.geteOwner().getName()+"请选择玩家编号使用乌龟卡");
+        this.textTip.showTextTip(card.getOwner(),card.getOwner().getName()+"请选择玩家编号使用乌龟卡");
         try{
-            int num=reader.read();
-            reader.readLine();
+            int num=Integer.parseInt(reader.readLine());
             PlayerModel target=this.run.getplayerWithnum(num);
             if(target==null) {
                 this.textTip.showTextTip(null,"该玩家不存在");
@@ -918,15 +905,13 @@ import java.util.List;
                 return;
             }
             else{
-                if(card.geteOwner().getNumber()==num){
-                   //card.geteOwner().getEffectCards().add(card);
-                    //card.seteOwner(card.getOwner());
+                if(target.getNumber()==card.getOwner().getNumber()){
                     for(int i=0;i<3;i++){
                         TortoiseCard tmp=new TortoiseCard(null);
                         card.getOwner().addEffecCard(tmp);
                     }
-                   this.textTip.showTextTip(card.geteOwner(),card.geteOwner().getName()+"对自己使用了乌龟卡");
-                   card.geteOwner().getCards().remove(card);
+                   this.textTip.showTextTip(card.getOwner(),card.getOwner().getName()+"对自己使用了乌龟卡");
+                   card.getOwner().getCards().remove(card);
                 }
                 else{
                   target.getEffectCards().add(card);
@@ -936,7 +921,7 @@ import java.util.List;
                         TortoiseCard tmp=new TortoiseCard(null);
                         target.addEffecCard(tmp);
                     }
-                  card.geteOwner().getCards().remove(card);
+                  card.getOwner().getCards().remove(card);
                 }
             }
         }
@@ -951,30 +936,9 @@ import java.util.List;
      *
      */
     private void useTallageCard(Card card) {
-//        Object[] options = { "确认使用", "重新选择" };
-//        int response = JOptionPane.showOptionDialog(null, "确认使用\"查税卡\"从 \""
-//                        + card.getOwner().getOtherPlayer().getName() + "\"手中获得 10%税款?",
-//                "卡片使用阶段.", JOptionPane.YES_OPTION, JOptionPane.PLAIN_MESSAGE,
-//                null, options, options[0]);
-//        if (response == 0) {
-//            // 使用
-//            int money = (int) (card.getOwner().getOtherPlayer().getCash() / 10);
-//            card.getOwner().setCash(card.getOwner().getCash() + money);
-//            card.getOwner()
-//                    .getOtherPlayer()
-//                    .setCash(card.getOwner().getOtherPlayer().getCash() - money);
-//            // 增加文本提示
-//            this.textTip.showTextTip(card.getOwner(), card.getOwner().getName()
-//                    + " 使用了 \"查税卡\"，从 \""
-//                    + card.getOwner().getOtherPlayer().getName()
-//                    + "\"手中获得 10%税款", 2);
-//            // 　减去卡片
-//            card.getOwner().getCards().remove(card);
-//        }
-        this.textTip.showTextTip(card.geteOwner(),card.geteOwner().getName()+"请选择玩家编号使用查税卡");
+        this.textTip.showTextTip(card.getOwner(),card.getOwner().getName()+"请选择玩家编号使用查税卡");
         try{
-            int num=reader.read();
-            reader.readLine();
+            int num=Integer.parseInt(reader.readLine());
             PlayerModel target=this.run.getplayerWithnum(num);
             if(target==null) {
                 this.textTip.showTextTip(null,"该玩家不存在");
@@ -986,7 +950,7 @@ import java.util.List;
               card.getOwner().setCash(card.getOwner().getCash()+money);
               target.setCash(target.getCash()-money);
               //增加文本提示
-                this.textTip.showTextTip(card.getOwner(),card.getOwner().getName()+"使用了查税卡,从"+target.getName()+"手中获得 10%税款");
+                this.textTip.showTextTip(card.getOwner(),card.getOwner().getName()+"使用了查税卡,从"+target.getName()+"手中获得"+money+"税款");
                 card.getOwner().getCards().remove(card);
             }
         }
@@ -1002,10 +966,9 @@ import java.util.List;
      *
      */
     private void useStopCard(Card card) {
-        this.textTip.showTextTip(card.geteOwner(),card.geteOwner().getName()+"请选择玩家编号使用停留卡");
+        this.textTip.showTextTip(card.getOwner(),card.getOwner().getName()+"请选择玩家编号使用停留卡");
         try{
-            int num=reader.read();
-            reader.readLine();
+            int num=Integer.parseInt(reader.readLine());
             PlayerModel target=this.run.getplayerWithnum(num);
             if(target==null) {
                 this.textTip.showTextTip(null,"该玩家不存在");
@@ -1013,17 +976,17 @@ import java.util.List;
                 return;
             }
             else{
-                if(card.geteOwner().getNumber()==num){
-                    card.seteOwner(card.getOwner());
-                    card.geteOwner().addEffecCard(card);
-                    this.textTip.showTextTip(card.geteOwner(),card.geteOwner().getName()+"对自己使用了停留卡");
-                    card.geteOwner().getCards().remove(card);
+                if(card.getOwner().getNumber()==num){
+                    card.setOwner(card.getOwner());
+                    card.getOwner().addEffecCard(card);
+                    this.textTip.showTextTip(card.getOwner(),card.getOwner().getName()+"对自己使用了停留卡");
+                    card.getOwner().getCards().remove(card);
                 }
                 else{
                     target.addEffecCard(card);
                     card.seteOwner(target);
                     this.textTip.showTextTip(card.getOwner(),card.getOwner().getName()+"对"+target.getName()+"使用了停留卡");
-                    card.geteOwner().getCards().remove(card);
+                    card.getOwner().getCards().remove(card);
                 }
             }
         }
@@ -1039,41 +1002,9 @@ import java.util.List;
      *
      */
     private void useRobCard(Card card) {
-//        if (card.getOwner().getCards().size() >= PlayerModel.MAX_CAN_HOLD_CARDS) {
-//            // 无法使用
-//            Object[] options = { "重新选择" };
-//            JOptionPane.showOptionDialog(null, " 您的卡片数量已经达到上限，无法使用\"抢夺卡\"",
-//                    "卡片使用阶段.", JOptionPane.YES_OPTION,
-//                    JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
-//        } else if (card.getOwner().getOtherPlayer().getCards().size() == 0) {
-//            // 无法使用
-//            Object[] options = { "重新选择" };
-//            JOptionPane.showOptionDialog(null, " \""
-//                            + card.getOwner().getOtherPlayer().getName()
-//                            + "\"没有卡片，无法使用\"抢夺卡\"", "卡片使用阶段.", JOptionPane.YES_OPTION,
-//                    JOptionPane.PLAIN_MESSAGE, null, options, options[0]);
-//        } else {
-//            PlayerModel srcPlayer = card.getOwner().getOtherPlayer();
-//            // 随机选取一张
-////			System.out.println(srcPlayer.getCards().size() + "zhang");
-//            Card getCard = srcPlayer.getCards().get((int) (srcPlayer.getCards().size() * Math.random()));
-//            // 对手丧失卡片
-//            srcPlayer.getCards().remove(getCard);
-//            // 卡片拥有者获得
-//            card.getOwner().getCards().add(getCard);
-//            // 更改获得卡片拥有者
-//            getCard.setOwner(card.getOwner());
-//            // 增加文本提示
-//            this.textTip.showTextTip(card.getOwner(), card.getOwner().getName()
-//                    + " 使用了 \"抢夺卡\"，抢夺了 \"" + srcPlayer.getName() + "\"的一张\""
-//                    + getCard.getcName() + ".\". ", 2);
-//            // 　减去卡片
-//            card.getOwner().getCards().remove(card);
-//        }
         this.textTip.showTextTip(card.getOwner(),"请输入玩家编号使用抢夺卡");
         try{
-            int num= reader.read();
-            reader.readLine();
+            int num=Integer.parseInt(reader.readLine());
             PlayerModel target=this.run.getplayerWithnum(num);
             if(target==null) {
                 this.textTip.showTextTip(null,"该玩家不存在");
@@ -1084,6 +1015,10 @@ import java.util.List;
                 this.textTip.showTextTip(null,target.getName()+"没有卡片，无法使用抢夺卡");
                 return;
             }
+            else if(target.getNumber()==card.getOwner().getNumber()){
+                this.textTip.showTextTip(null,"无法对自己使用抢夺卡");
+                return;
+            }
             else {
                 Card getcard=target.getCards().get((int)(target.getCards().size()*Math.random()));
                 //对手丧失卡片
@@ -1091,7 +1026,7 @@ import java.util.List;
                 //卡片拥有者获得
                 card.getOwner().getCards().add(getcard);
                 //更改卡片拥有者
-                getcard.seteOwner(card.geteOwner());
+                getcard.seteOwner(card.getOwner());
                 //提示信息
                 this.textTip.showTextTip(card.getOwner(),card.getOwner().getName()+"使用了抢夺卡，抢夺了"+target.getName()+"的一张"+getcard.getcName());
                 //减去卡片
@@ -1125,15 +1060,11 @@ import java.util.List;
             } else {
                 // 无法使用,不可降级
                this.textTip.showTextTip(null,"当前房屋不可降级");
-               //重新选择卡片
-                UseCard();
                 return;
             }
         } else {
             // 无法使用.
             this.textTip.showTextTip(null,"当前房屋不可使用降级卡");
-            //重新选择卡片
-            UseCard();
             return;
         }
     }
@@ -1167,7 +1098,6 @@ import java.util.List;
                         card.getOwner().getCards().remove(card);
                     } else {
                         this.textTip.showTextTip(null, " 金币不足，无法购买房屋!");
-                        UseCard();
                         return;
                     }
                 }
@@ -1181,7 +1111,6 @@ import java.util.List;
             }
         } else {
            this.textTip.showTextTip(null, "此房屋无法使用该卡片.");
-           UseCard();
            return;
         }
     }
@@ -1229,7 +1158,7 @@ import java.util.List;
              useAveragerPoorCard(card);
              return;
          }
-         if(target.equals(card.geteOwner())){
+         if(target.equals(card.getOwner())){
              this.textTip.showTextTip(null,"不能对自己使用均贫卡");
              useAveragerPoorCard(card);
              return;
@@ -1272,13 +1201,11 @@ import java.util.List;
             } else {
                 // 无法使用,不可升级
               this.textTip.showTextTip(null, " 当前房屋不可升级.");
-              UseCard();
               return;
             }
         } else {
             // 无法使用.
              this.textTip.showTextTip(null, " 当前房屋不能使用该卡片");
-             UseCard();
              return;
         }
     }
@@ -1297,10 +1224,9 @@ import java.util.List;
                PlayerModel target=this.run.getplayerWithnum(num);
                if(target==null){
                    this.textTip.showTextTip(null,"该玩家不存在");
-                   useChangeCard(card);
                    return;
                }
-               if(target.equals(card.geteOwner())){
+               if(target.equals(card.getOwner())){
                    this.textTip.showTextTip(null,"不能对自己使用换屋卡");
                    useChangeCard(card);
                    return;
@@ -1327,7 +1253,6 @@ import java.util.List;
            }
         } else {
             this.textTip.showTextTip(null,"当前房屋不可使用换屋卡");
-            UseCard();
             return;
         }
     }
