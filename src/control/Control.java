@@ -1,5 +1,4 @@
 package control;
-//import model.BackgroundModel;
 import model.BuildingsModel;
 import model.DiceModel;
 //import model.EffectModel;
@@ -459,14 +458,35 @@ import java.util.List;
      *
      */
     private void stopInShop(Building b, PlayerModel player) {
-        if (player.getNx() > 0) {
+        if (player.getNx() >= 100) {
             // 为商店的货架从新生成商品
             ((Shop) b).createCards();
             // 为商店面板更新新的卡片商品
-            this.textTip.showTextTip(player, player.getName() + "到达了商店");
+            this.textTip.showTextTip(player, player.getName() + "到达了商店，卡片道具单价100点券，商品列表如下");
+            List<Card> cards=((Shop)b).getCards();
+            for(int i=0;i<cards.size();i++){
+                int num=i+1;
+                this.textTip.showTextTip(null,"商品编号: "+num+" "+cards.get(i).getcName());
+            }
+            this.textTip.showTextTip(null,"请输入你要购买的商品的商品编号(限购一张)，输入不存在的商品编号表示不购买");
+            try{
+                int number=Integer.parseInt(reader.readLine());
+                if(number<=0||number>cards.size()) {
+                    this.textTip.showTextTip(null,"取消购买");
+                    return;
+                }
+                Card boughtcard=cards.get(number-1);
+                buyCard(player,boughtcard);
+                //提示信息
+                this.textTip.showTextTip(null,player.getName()+"花费100点券购买了"+boughtcard.getcName());
+                return;
+            }
+            catch(IOException e){
+                System.out.print(e);
+            }
         }
         else{
-            this.textTip.showTextTip(player,player.getName()+"到达商店，但是没钱购买");
+            this.textTip.showTextTip(player,player.getName()+"到达了商店，但是点券数不足100，被老板赶了出来");
         }
     }/**
      *
@@ -1255,6 +1275,19 @@ import java.util.List;
             this.textTip.showTextTip(null,"当前房屋不可使用换屋卡");
             return;
         }
+    }
+    /**
+     *
+     * 购买卡片
+    * */
+    public void buyCard(PlayerModel player,Card card){
+        //减去玩家点券数
+        player.setNx(player.getNx()-100);
+        //加入卡片
+        player.getCards().add(card);
+        //设置卡片拥有者
+        card.setOwner(player);
+        return;
     }
 
     /**

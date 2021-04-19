@@ -275,5 +275,7 @@ public class PlayerModel implements GamePort{
             }
 
         }
+        //初始化玩家点券数目
+        this.setNx(100);
     }
 }
