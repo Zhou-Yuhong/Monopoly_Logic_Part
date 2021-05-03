@@ -1,7 +1,7 @@
 package control;
 import model.PlayerModel;
 import model.buildings.Building;
-
+import interaction.Config;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -35,7 +35,7 @@ public class GameRunning {
     /**
      * 玩家使用卡片状态
      */
-    public static int STATE_CARD = 1;
+    public static int STATE_USE_CARD = 1;
     /**
      * 玩家卡片作用状态
      */
@@ -45,9 +45,9 @@ public class GameRunning {
      */
     public static int STATE_THROWDICE = 3;
     /**
-     * 玩家移动状态
+     * 等待选择
      */
-    public static int STATE_MOVE = 4;
+    public static int STATE_WAIT_CHOICE = 4;
     /**
      *
      * 游戏终止状态
@@ -60,8 +60,13 @@ public class GameRunning {
      *
      */
     private int nowPlayerState;
-
-
+     /**
+      *
+      * 最近一次的建筑变化
+     * */
+     private int building_x;
+     private int building_y;
+     private int change_type;
 
     /**
      *
@@ -75,7 +80,7 @@ public class GameRunning {
      * 当前地图代码
      *
      */
-    public static int MAP = 3;
+    public static int MAP = 4;
     /**
      *
      * 游戏上限天数 - 1为无上限
@@ -150,23 +155,23 @@ public class GameRunning {
 //            }
 //        }
 //    }
-       public void nextState(){
-           if(gameContinue()){
-               if(this.nowPlayerState==STATE_THROWDICE){
-                   //若当前是“掷点状态”，则接下来进入移动状态
-                   this.nowPlayerState=STATE_MOVE;
-               }
-               else if(this.nowPlayerState==STATE_MOVE){
-                   //若现在的状态是”移动状态“，则接下来会进入卡片使用状态
-                   this.nowPlayerState=STATE_CARD;
-               }
-               else if(this.nowPlayerState==STATE_CARD){
-                   //若现在的状态是使用卡片状态，则接下来换人且进入掷骰子状态
-                   this.nowPlayerState=STATE_THROWDICE;
-                   this.nextPlayer();
-               }
-           }
-       }
+//       public void nextState(){
+//           if(gameContinue()){
+//               if(this.nowPlayerState==STATE_THROWDICE){
+//                   //若当前是“掷点状态”，则接下来进入移动状态
+//                   this.nowPlayerState=STATE_MOVE;
+//               }
+//               else if(this.nowPlayerState==STATE_MOVE){
+//                   //若现在的状态是”移动状态“，则接下来会进入卡片使用状态
+//                   this.nowPlayerState=STATE_CARD;
+//               }
+//               else if(this.nowPlayerState==STATE_CARD){
+//                   //若现在的状态是使用卡片状态，则接下来换人且进入掷骰子状态
+//                   this.nowPlayerState=STATE_THROWDICE;
+//                    this.nextPlayer();
+//               }
+//           }
+//       }
     /**
      *
      * 获取当前玩家
@@ -182,9 +187,9 @@ public class GameRunning {
 
 
     /**
-     * 换人操作
+     * 换人操作,换人操作里减少了时间
      */
-    private void nextPlayer() {
+    public void nextPlayer() {
         // 减少时间
         if (this.nowPlayer.getInPrison() > 0) {
             this.nowPlayer.setInPrison(this.nowPlayer.getInPrison() - 1);
@@ -266,6 +271,30 @@ public class GameRunning {
         return null;
     }
 
+    /**
+     *
+     * 设置建筑变化的一些函数
+    * */
+    public void setBuilding_x(int building_x) {
+        this.building_x = building_x;
+    }
+
+    public void setBuilding_y(int building_y) {
+        this.building_y = building_y;
+    }
+
+    public void setChange_type(int change_type) {
+        this.change_type = change_type;
+    }
+    public int  getBuilding_x(){
+        return this.building_x;
+    }
+    public int getBuilding_y(){
+        return this.building_y;
+    }
+    public int getChange_type(){
+        return this.change_type;
+    }
     /**
      *
      * 开始游戏设置

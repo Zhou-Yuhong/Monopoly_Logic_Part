@@ -1,7 +1,6 @@
 package control;
 import model.BuildingsModel;
 import model.DiceModel;
-//import model.EffectModel;
 import model.EventsModel;
 import model.LandModel;
 import model.PlayerModel;
@@ -19,7 +18,7 @@ import model.card.Card;
 import model.card.ControlDiceCard;
 import model.card.TortoiseCard;
 import context.GameState;
-
+import interaction.Config;
 import javax.swing.*;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -98,58 +97,67 @@ import java.util.List;
      */
     public void start() {
         // 游戏环境开始
-        String nameinput;
-        this.textTip.showTextTip(null,"输入玩家1姓名");
-        try{
-            nameinput=reader.readLine();
-            this.players.get(0).setName(nameinput);
-        }
-        catch (IOException e){
-            System.out.print(e);
-        }
-        this.textTip.showTextTip(null,"请输入玩家2姓名");
-        try{
-            nameinput=reader.readLine();
-            this.players.get(1).setName(nameinput);
-        }
-        catch (IOException e){
-            System.out.print(e);
-        }
-        this.textTip.showTextTip(null,"请输入玩家3姓名");
-        try{
-            nameinput=reader.readLine();
-            this.players.get(2).setName(nameinput);
-        }
-        catch (IOException e){
-            System.out.print(e);
-        }
-        this.textTip.showTextTip(null,"请输入玩家4姓名");
-        try{
-            nameinput=reader.readLine();
-            this.players.get(3).setName(nameinput);
-        }
-        catch (IOException e){
-            System.out.print(e);
-        }
+        //方便过迭代，直接用“玩家”+num做名字了
+        this.players.get(0).setName("玩家1");
+        this.players.get(1).setName("玩家2");
+        this.players.get(2).setName("玩家3");
+        this.players.get(3).setName("玩家4");
+//        String nameinput;
+//        this.textTip.showTextTip(null,"输入玩家1姓名");
+//        try{
+//            nameinput=reader.readLine();
+//            this.players.get(0).setName(nameinput);
+//        }
+//        catch (IOException e){
+//            System.out.print(e);
+//        }
+//        this.textTip.showTextTip(null,"请输入玩家2姓名");
+//        try{
+//            nameinput=reader.readLine();
+//            this.players.get(1).setName(nameinput);
+//        }
+//        catch (IOException e){
+//            System.out.print(e);
+//        }
+//        this.textTip.showTextTip(null,"请输入玩家3姓名");
+//        try{
+//            nameinput=reader.readLine();
+//            this.players.get(2).setName(nameinput);
+//        }
+//        catch (IOException e){
+//            System.out.print(e);
+//        }
+//        this.textTip.showTextTip(null,"请输入玩家4姓名");
+//        try{
+//            nameinput=reader.readLine();
+//            this.players.get(3).setName(nameinput);
+//        }
+//        catch (IOException e){
+//            System.out.print(e);
+//        }
         // 刷新对象初始数据
         for (GamePort temp : this.models) {
             temp.startGameInit();
         }
         this.run.startGameInit();
+        //设置提示信息
+        this.textTip.showTextTip(null,"游戏开始，轮到玩家1掷骰子");
     }
     public void rungame(){
         GameRunning gr=this.getRunning();
         while(gr.gameContinue()){
             if(gr.getNowPlayerState()==gr.STATE_THROWDICE){
-                playDice();
-                continue;
-            }
-            if(gr.getNowPlayerState()==gr.STATE_MOVE){
+                //暂时处理
+                playDice(0);
                 move();
                 continue;
             }
-            if(gr.getNowPlayerState()==gr.STATE_CARD){
-                UseCard();
+            if(gr.getNowPlayerState()==gr.STATE_WAIT_CHOICE){
+
+                continue;
+            }
+            if(gr.getNowPlayerState()==gr.STATE_USE_CARD){
+                UseCard(0);
                 continue;
             }
         }
@@ -188,10 +196,12 @@ import java.util.List;
      *
      *
      */
-    public void playDice()  {
+    public void playDice(int dice_num)  {
         PlayerModel player=this.run.getNowPlayer();
         if(player.getInHospital()>0||player.getInPrison()>0){
-            this.run.nextState();  //由掷骰子状态转到移动
+            //直接跳过该玩家
+            this.run.setNowPlayerState(GameRunning.STATE_THROWDICE);
+            this.run.nextPlayer();
             if(player.getInHospital()>0){
                 this.textTip.showTextTip(player,player.getName()+"住院中,不能掷骰子");
                 //player.setInHospital(player.getInHospital()-1);
@@ -200,18 +210,19 @@ import java.util.List;
                 this.textTip.showTextTip(player,player.getName()+"在监狱中，不能掷骰子");
                // player.setInPrison(player.getInPrison()-1);
             }
-            this.run.nextState();//由移动状态转到使用卡片
+
         }
         else{
             if(player.getEffectCards().empty()) {  //没有影响玩家的卡片，掷骰子
-                this.textTip.showTextTip(player, "轮到" + player.getName() + "请输入骰子点数");
-                try {
-                    String ss = reader.readLine();
-                    int result = Integer.parseInt(ss);
-                    handleDicenum(result);
-                } catch (IOException e) {
-                    System.out.print(e);
-                }
+                //this.textTip.showTextTip(player, "轮到" + player.getName() + "请输入骰子点数");
+                handleDicenum(dice_num);
+//                try {
+//                    String ss = reader.readLine();
+//                    int result = Integer.parseInt(ss);
+//                    handleDicenum(result);
+//                } catch (IOException e) {
+//                    System.out.print(e);
+//                }
             }
             else{
                 Card card=player.getEffectCard();
@@ -238,46 +249,31 @@ import java.util.List;
      * 使用卡片
      *
     * */
-    public void UseCard(){
+    public void UseCard(int card_num){
         PlayerModel player=this.run.getNowPlayer();
-        if(player.getInHospital()>0||player.getInPrison()>0){
-            this.run.nextState();  //由用卡片状态转到换人
-            if(player.getInHospital()>0){
-                this.textTip.showTextTip(player,player.getName()+"住院中,不能使用卡片");
-
-            }else if(player.getInPrison()>0){
-                this.textTip.showTextTip(player,player.getName()+"在监狱中，不能使用卡片");
-            }
-            return;
-        }
         List<Card> cards=player.getCards();
         if(cards.size()==0){
             this.textTip.showTextTip(null,player.getName()+"没有卡片，跳过使用卡片环节");
-            this.run.nextState();
+            this.run.setNowPlayerState(GameRunning.STATE_THROWDICE);
+            this.run.nextPlayer();
             return;
         }
         else {
-            this.textTip.showTextTip(null,"请输入编号来选择要使用的卡片(输入范围外数字表示不使用卡片)");
-            for(int i=0;i<cards.size();i++){
-                Integer tmp=i+1;
-                this.textTip.showTextTip(null,tmp.toString()+" "+cards.get(i).getcName());
-            }
-            try{
-              int num=Integer.parseInt(reader.readLine());
-               if(num<=0||num>cards.size()) {
+               if(card_num<0||card_num>=cards.size()) {
                    this.textTip.showTextTip(null,player.getName()+"不使用卡片");
-                   this.run.nextState();
+                   this.run.setNowPlayerState(GameRunning.STATE_THROWDICE);
+                   this.run.nextPlayer();
                    return;
                }
                else{
-                 Card card=cards.get(num-1);
+                 Card card=cards.get(card_num);
                  useCard(card);
-                  this.run.nextState();
+                 this.run.setNowPlayerState(GameRunning.STATE_THROWDICE);
+                 this.run.nextPlayer();
+                 return;
                }
-                }
-            catch (IOException e){
-                System.out.print(e);
-            }
+
+
         }
     }
 
@@ -291,7 +287,7 @@ import java.util.List;
         //通过run的状态更新外部骰子
         this.dice.setPoint(this.run.getPoint());
         //转换转态到移动状态
-        this.run.nextState();
+        //this.run.nextState();
     }
     /**
      *运动的总函数
@@ -313,7 +309,7 @@ import java.util.List;
         }
         //玩家停下操作
         this.playerStop();
-        this.run.nextState();
+        //this.run.nextState();
     }
     /**
      *
@@ -404,7 +400,21 @@ import java.util.List;
 
         }
     }
-
+    public void playerChoose(boolean choice){
+        // 当前玩家
+        PlayerModel player = this.run.getNowPlayer();
+        // 该地点房屋
+        Building building = this.building.getBuilding(player.getX(),player.getY());
+        if(building.getEvent()==GameState.HUOSE_EVENT){
+            if(building.getOwner()==player){
+                this.upHouseLevelChoice(building,player,choice);
+            }
+            else{
+                this.buyHouseChoice(building,player,choice);
+            }
+        }
+        this.run.setNowPlayerState(GameRunning.STATE_USE_CARD);
+    }
     /**
      *
      * 停留房屋事件处理
@@ -416,6 +426,9 @@ import java.util.List;
             case GameState.HOSPITAL_EVENT:
                 // 停留在医院
                 stopInHospital(b, player);
+                //把state 变成投骰子，转变到下一个玩家
+                this.run.setNowPlayerState(GameRunning.STATE_THROWDICE);
+                this.run.nextPlayer();
                 break;
             case GameState.HUOSE_EVENT:
                 // 停留在可操作土地
@@ -424,26 +437,38 @@ import java.util.List;
             case GameState.LOTTERY_EVENT:
                 // 停留在乐透点上
                 stopInLottery(b, player);
+                //转变到使用卡片的state
+                this.run.setNowPlayerState(GameRunning.STATE_USE_CARD);
                 break;
             case GameState.NEWS_EVENT:
                 // 停留在新闻点上
                 stopInNews(b, player);
+                //转变到使用卡片的state
+                this.run.setNowPlayerState(GameRunning.STATE_USE_CARD);
                 break;
             case GameState.ORIGIN_EVENT:
                 // 停留在原点
                 stopInOrigin(b, player);
+                //转变到使用卡片的state
+                this.run.setNowPlayerState(GameRunning.STATE_USE_CARD);
                 break;
             case GameState.PARK_EVENT:
                 // 停留在公园
                 stopInPack(b, player);
+                //转变到使用卡片的state
+                this.run.setNowPlayerState(GameRunning.STATE_USE_CARD);
                 break;
             case GameState.POINT_EVENT:
                 // 停留在点卷位
                 stopInPoint(b, player);
+                //转变到使用卡片的state
+                this.run.setNowPlayerState(GameRunning.STATE_USE_CARD);
                 break;
             case GameState.PRISON_EVENT:
                 // 停留在监狱
                 stopInPrison(b, player);
+                //转变到使用卡片的state
+                this.run.setNowPlayerState(GameRunning.STATE_USE_CARD);
                 break;
             case GameState.SHOP_EVENT:
                 // 停留在商店
@@ -677,6 +702,8 @@ import java.util.List;
             if (b.getOwner() == null) { // 无人房屋
                 // 执行买房操作
                 this.buyHouse(b, player);
+                //把state更改为waitchoice状态
+                this.run.setNowPlayerState(GameRunning.STATE_WAIT_CHOICE);
             } else {// 有人房屋
                 if (b.getOwner().equals(player)) {// 自己房屋
                     // 执行升级房屋操作
@@ -684,6 +711,7 @@ import java.util.List;
                 } else {// 别人房屋
                     // 执行交税操作
                     this.giveTax(b, player);
+                    this.run.setNowPlayerState(GameRunning.STATE_USE_CARD);
                 }
             }
         }
@@ -714,7 +742,6 @@ import java.util.List;
                     + b.getOwner().getName() + "的地盘，过路费:" + revenue + "金币.");
 
         }
-
     }
     /**
      *
@@ -730,32 +757,35 @@ import java.util.List;
             String upName = b.getUpName();
            this.textTip.showTextTip(player,
                     "亲爱的:" + player.getName() + "\r\n" + "是否升级这块地？\r\n" + name
-                            + "→" + upName + "\r\n" + "价格：" + price + " 金币. 按下Y表示确认");
+                            + "→" + upName + "\r\n" + "价格：" + price + " 金币.");
+         this.run.setNowPlayerState(GameRunning.STATE_WAIT_CHOICE);
 
-           try{
-               flag=(char)reader.read();
-               String tmp=reader.readLine();
-           }
-           catch(IOException e){
-               System.out.print(e);
-           }
-            if (flag == 'Y'||flag=='y') {
-                if (player.getCash() >= price) {
-                    b.setLevel(b.getLevel() + 1);
-                    // 减少需要的金币
-                    player.setCash(player.getCash() - price);
-                    // 增加文本提示
-                    this.textTip.showTextTip(player, player.getName() + " 从 "
-                            + name + " 升级成 " + upName + ".花费了 " + price
-                            + "金币. ");
-                } else {
-                    // 增加文本提示
-                    this.textTip.showTextTip(player, player.getName()
-                            + " 金币不足,操作失败. ");
-                }
-            }
+        }
+        else{
+            this.textTip.showTextTip(player, "该地块已到最高级，无法继续升级");
+            this.run.setNowPlayerState(GameRunning.STATE_USE_CARD);
         }
 
+    }
+    private void upHouseLevelChoice(Building b, PlayerModel player,boolean choice){
+        int price = b.getUpLevelPrice();
+        String name = b.getName();
+        String upName = b.getUpName();
+        if (choice) {
+            if (player.getCash() >= price) {
+                b.setLevel(b.getLevel() + 1);
+                // 减少需要的金币
+                player.setCash(player.getCash() - price);
+                // 增加文本提示
+                this.textTip.showTextTip(player, player.getName() + " 从 "
+                        + name + " 升级成 " + upName + ".花费了 " + price
+                        + "金币. ");
+            } else {
+                // 增加文本提示
+                this.textTip.showTextTip(player, player.getName()
+                        + " 金币不足,操作失败. ");
+            }
+        }
     }
     /**
      *
@@ -770,16 +800,11 @@ import java.util.List;
                 player,
                 "亲爱的:" + player.getName() + "\r\n" + "是否购买下这块地？\r\n"
                         + b.getName() + "→" + b.getUpName() + "\r\n" + "价格："
-                        + price + " 金币. 输入Y表示购买这块地");
-
-        try{
-            flag=(char)reader.read();
-            String tmp=reader.readLine();
-        }
-        catch(IOException e){
-            System.out.print(e);
-        }
-        if (flag=='Y'||flag=='y') {
+                        + price + " 金币");
+    }
+    private void buyHouseChoice(Building b, PlayerModel player,boolean choice){
+        int price = b.getUpLevelPrice();
+        if (choice) {
             // 购买
             if (player.getCash() >= price) {
                 b.setOwner(player);
@@ -790,9 +815,17 @@ import java.util.List;
                 player.setCash(player.getCash() - price);
                 this.textTip.showTextTip(player, player.getName()
                         + " 买下了一块空地.花费了: " + price + "金币. ");
+                //设置改变的房屋信息
+                this.run.setBuilding_x(player.getX());
+                this.run.setBuilding_y(player.getY());
+                this.run.setChange_type(player.getNumber());
             } else {
                 this.textTip.showTextTip(player, player.getName()
                         + " 金币不足,操作失败. ");
+                //设置房屋改变信息
+                this.run.setBuilding_x(player.getX());
+                this.run.setBuilding_y(player.getY());
+                this.run.setChange_type(Config.FAILURE);
             }
         }
 
@@ -1075,16 +1108,26 @@ import java.util.List;
                         + " 使用了 \"降级卡\"，将\""
                         + building.getOwner().getName()
                         + "\"的房屋等级降低一级. ");
+                //设置提示信息
+                this.run.setBuilding_x(card.getOwner().getX());
+                this.run.setBuilding_y(card.getOwner().getY());
+                this.run.setChange_type(Config.LEVEL_DOWN);
                 // 　减去卡片
                 card.getOwner().getCards().remove(card);
             } else {
                 // 无法使用,不可降级
                this.textTip.showTextTip(null,"当前房屋不可降级");
+                this.run.setBuilding_x(card.getOwner().getX());
+                this.run.setBuilding_y(card.getOwner().getY());
+                this.run.setChange_type(Config.FAILURE);
                 return;
             }
         } else {
             // 无法使用.
             this.textTip.showTextTip(null,"当前房屋不可使用降级卡");
+            this.run.setBuilding_x(card.getOwner().getX());
+            this.run.setBuilding_y(card.getOwner().getY());
+            this.run.setChange_type(Config.FAILURE);
             return;
         }
     }
@@ -1098,11 +1141,6 @@ import java.util.List;
         Building building = this.building.getBuilding(card.getOwner().getX(),card.getOwner().getY());
         if (building.getOwner() != null
                 && !building.getOwner().equals(card.getOwner())) {// 是对方的房屋
-            this.textTip.showTextTip(card.getOwner(),"确认使用\"购地卡\"将此地收购？需要花费：" + building.getAllPrice() + " 金币.");
-            try{
-                char choose=(char)reader.read();
-                reader.readLine();
-                if(choose=='Y'||choose=='y'){
                     if (card.getOwner().getCash() >= building.getAllPrice()) {
                         // 金币交换
                         building.getOwner().setCash(
@@ -1113,24 +1151,28 @@ import java.util.List;
                         building.setOwner(card.getOwner());
                         // 增加文本提示
                         this.textTip.showTextTip(card.getOwner(), card.getOwner()
-                                .getName() + " 使用了 \"购地卡\"，收购获得了该土地. ");
+                                .getName() + " 使用了 \"购地卡\"，花费了"+building.getAllPrice()+"金币收购获得了该土地. ");
+                        //设置提示信息
+                        this.run.setBuilding_x(card.getOwner().getX());
+                        this.run.setBuilding_y(card.getOwner().getY());
+                        this.run.setChange_type(card.getOwner().getNumber());
                         // 　减去卡片
                         card.getOwner().getCards().remove(card);
+
+
                     } else {
                         this.textTip.showTextTip(null, " 金币不足，无法购买房屋!");
+                        this.run.setBuilding_x(card.getOwner().getX());
+                        this.run.setBuilding_y(card.getOwner().getY());
+                        this.run.setChange_type(Config.FAILURE);
                         return;
                     }
                 }
-                else {
-                    //取消使用
-                    return;
-                }
-            }
-            catch(IOException e){
-                System.out.print(e);
-            }
-        } else {
+        else {
            this.textTip.showTextTip(null, "此房屋无法使用该卡片.");
+            this.run.setBuilding_x(card.getOwner().getX());
+            this.run.setBuilding_y(card.getOwner().getY());
+            this.run.setChange_type(Config.FAILURE);
            return;
         }
     }
@@ -1218,14 +1260,26 @@ import java.util.List;
                         .getName() + " 使用了 \"加盖卡\"，将房屋等级提升一级. ");
                 // 　减去卡片
                 card.getOwner().getCards().remove(card);
+                //设置提示信息
+                this.run.setBuilding_x(card.getOwner().getX());
+                this.run.setBuilding_y(card.getOwner().getY());
+                this.run.setChange_type(Config.LEVEL_UP);
             } else {
                 // 无法使用,不可升级
               this.textTip.showTextTip(null, " 当前房屋不可升级.");
+              //设置提示信息
+                this.run.setBuilding_x(card.getOwner().getX());
+                this.run.setBuilding_y(card.getOwner().getY());
+                this.run.setChange_type(Config.FAILURE);
               return;
             }
         } else {
             // 无法使用.
              this.textTip.showTextTip(null, " 当前房屋不能使用该卡片");
+            //设置提示信息
+            this.run.setBuilding_x(card.getOwner().getX());
+            this.run.setBuilding_y(card.getOwner().getY());
+            this.run.setChange_type(Config.FAILURE);
              return;
         }
     }
@@ -1266,7 +1320,6 @@ import java.util.List;
                        card.getOwner().getCards().remove(card);
                    }
                }
-
            }
            catch(IOException e){
                System.out.print(e);

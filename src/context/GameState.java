@@ -34,7 +34,7 @@ public class GameState {
 
     public final static int ORIGIN_PASS_EVENT = 1;
 
-    // 使用卡片返回状态
+    // 使用卡片类型
 
     public  final static int CARD_ADDLEVEL = 1;
 
@@ -67,6 +67,6 @@ public class GameState {
     public final static int CARD_BUFF_TORTOISE = 2;
 
     //地图有多少行和列
-    public final static int ROW_NUM=13;
-    public final static int LINE_NUM=8;
+    public final static int ROW_NUM=15;
+    public final static int LINE_NUM=10;
 }

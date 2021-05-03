@@ -230,6 +230,7 @@ public class PlayerModel implements GamePort{
         // 初始化玩家金钱
         this.cash = GameRunning.PLAYER_CASH;
         //给每个玩家随机发两张道具卡
+        //
         for(int i=0;i<2;i++){
             int num=(int)(Math.random()*13);
             switch(num){
