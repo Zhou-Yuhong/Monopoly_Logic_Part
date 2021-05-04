@@ -13,6 +13,8 @@ public class Config {
 
     //output 相关
     //对地块的操作
+    //无变化
+    public final static int NO_CHANGE=0;
     //归属为玩家1
     public final static int PLAYER_ONE_GET=1;
     //归属为玩家2
@@ -35,4 +37,16 @@ public class Config {
     public final static int ERROR_PLAYER_MISMATCH=2;
     //状态不对应
     public final static int ERROR_STATE_MISTAKE=3;
+
+
+    //游戏进行状态
+    public final static int PLAYER1_OUT=1;//玩家1出局
+    public final static int PLAYER2_OUT=2;//玩家2出局
+    public final static int PLAYER3_OUT=3;//玩家3出局
+    public final static int PLAYER4_OUT=4;//玩家4出局
+    public final static int NORMAL_STATE=0;//游戏正常进行
+    public final static int PLAYER1_WIN=5;//游戏结束，玩家1获胜
+    public final static int PLAYER2_WIN=6;//游戏结束，玩家2获胜
+    public final static int PLAYER3_WIN=7;//游戏结束，玩家3获胜
+    public final static int PLAYER4_WIN=8;//游戏结束，玩家4获胜
 }

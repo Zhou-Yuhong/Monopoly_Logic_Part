@@ -33,6 +33,10 @@ public class GameRunning {
     private int point;
 
     /**
+     * 一次操作后游戏状态
+    * */
+    private int game_status;
+    /**
      * 玩家使用卡片状态
      */
     public static int STATE_USE_CARD = 1;
@@ -64,10 +68,12 @@ public class GameRunning {
       *
       * 最近一次的建筑变化
      * */
-     private int building_x;
-     private int building_y;
-     private int change_type;
-
+     private int building_x=0;
+     private int building_y=0;
+     private int change_type=0;
+     public void  resetChange_type(){
+         this.change_type=0;
+     }
     /**
      *
      * 游戏进行天数
@@ -213,35 +219,53 @@ public class GameRunning {
      *
      *
      */
-    public boolean gameContinue() {
+    public int getGame_status(){
+        return this.game_status;
+    }
+    public void GameContinue(){
+        this.game_status=gameContinue();
+    }
+    public int gameContinue() {
         // 天数
         if (GAME_DAY > 0 && day >= GAME_DAY) {
             this.control.gameOver();
             //提示
             System.out.println("游戏结束");
-            return false;
+            int max=0;
+            int max_player=0;
+            for(int i=0;i<players.size();i++){
+                if(players.get(i).getCash()>max){
+                    max=players.get(i).getCash();
+                    max_player=i;
+                }
+            }
+            return 4+players.get(max_player).getNumber();
         }
         // 最大金钱
          for(int i=0;i<players.size();i++){
              if(MONEY_MAX>0&&players.get(i).getCash()>=MONEY_MAX){
               this.control.gameOver();
               System.out.println("游戏结束");
-              return false;
+              return 4+players.get(i).getNumber();
              }
          }
         // 破产
         for (int i=0;i<players.size();i++){
             if(players.get(i).getCash()<0){
                 System.out.println(players.get(i).getName()+"破产淘汰");
+                int sig=players.get(i).getNumber();
                 players.remove(i);
+                if(players.size()!=1){
+                    return sig;
+                }
             }
         }
         if(players.size()==1) {
             this.control.gameOver();
             System.out.println("游戏结束,玩家"+players.get(0).getName()+"获胜");
-            return false;
+            return players.get(0).getNumber()+4;
         }
-        return true;
+        return Config.NORMAL_STATE;
     }
 
     public void setPlayers(List<PlayerModel> players) {

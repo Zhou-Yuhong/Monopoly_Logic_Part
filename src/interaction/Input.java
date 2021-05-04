@@ -21,4 +21,10 @@ public class Input {
     public int getNum(){
         return this.num;
     }
+    public void setInput(int  type,int playernum,boolean choice, int num){
+        this.type=type;
+        this.playernum=playernum;
+        this.choice=choice;
+        this.num=num;
+    }
 }

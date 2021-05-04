@@ -143,25 +143,25 @@ import java.util.List;
         //设置提示信息
         this.textTip.showTextTip(null,"游戏开始，轮到玩家1掷骰子");
     }
-    public void rungame(){
-        GameRunning gr=this.getRunning();
-        while(gr.gameContinue()){
-            if(gr.getNowPlayerState()==gr.STATE_THROWDICE){
-                //暂时处理
-                playDice(0);
-                move();
-                continue;
-            }
-            if(gr.getNowPlayerState()==gr.STATE_WAIT_CHOICE){
-
-                continue;
-            }
-            if(gr.getNowPlayerState()==gr.STATE_USE_CARD){
-                UseCard(0);
-                continue;
-            }
-        }
-    }
+//    public void rungame(){
+//        GameRunning gr=this.getRunning();
+//        while(gr.gameContinue()){
+//            if(gr.getNowPlayerState()==gr.STATE_THROWDICE){
+//                //暂时处理
+//                playDice(0);
+//                move();
+//                continue;
+//            }
+//            if(gr.getNowPlayerState()==gr.STATE_WAIT_CHOICE){
+//
+//                continue;
+//            }
+//            if(gr.getNowPlayerState()==gr.STATE_USE_CARD){
+//                UseCard(0);
+//                continue;
+//            }
+//        }
+//    }
 
     public List<PlayerModel> getPlayers() {
         return players;

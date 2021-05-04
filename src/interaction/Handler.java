@@ -9,6 +9,8 @@ public class Handler {
          switch (type){
              case Config.GAME_START:
                  control.start();
+                 //判断游戏状态
+                 control.getRunning().GameContinue();
                  output.updateOutput(control);
                  return Config.NORMAL_RETURN;
              case Config.GIVE_DICE_NUM:
@@ -20,6 +22,8 @@ public class Handler {
                  }
                  control.playDice(input.getNum());
                  control.move();
+                 //判断游戏状态
+                 control.getRunning().GameContinue();
                  //更新output
                  output.updateOutput(control);
                  return Config.NORMAL_RETURN;
@@ -31,6 +35,8 @@ public class Handler {
                      return Config.ERROR_STATE_MISTAKE;
                  }
                  control.playerChoose(input.getChoice());
+                 //判断游戏状态
+                 control.getRunning().GameContinue();
                  output.updateOutput(control);
                  return Config.NORMAL_RETURN;
              case Config.GIVE_CARD_NUM:
@@ -41,6 +47,8 @@ public class Handler {
                      return Config.ERROR_STATE_MISTAKE;
                  }
                  control.UseCard(input.num);
+                 //判断游戏状态
+                 control.getRunning().GameContinue();
                  output.updateOutput(control);
                  return Config.NORMAL_RETURN;
          }

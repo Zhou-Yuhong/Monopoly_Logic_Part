@@ -229,53 +229,55 @@ public class PlayerModel implements GamePort{
 
         // 初始化玩家金钱
         this.cash = GameRunning.PLAYER_CASH;
-        //给每个玩家随机发两张道具卡
+        //给每个玩家随机发两张道具卡(加盖卡，降级卡)
+        this.getCards().add(new AddLevelCard(this));
+        this.getCards().add(new ReduceLevelCard(this));
         //
-        for(int i=0;i<2;i++){
-            int num=(int)(Math.random()*13);
-            switch(num){
-                case 0:
-                case 1:
-                    this.getCards().add(new AddLevelCard(this));
-                    break;
-                case 2:
-                    this.getCards().add(new AveragerPoorCard(this));
-                    break;
-                case 3:
-                    this.getCards().add(new ChangeCard(this));
-                    break;
-                case 4:
-                    this.getCards().add(new ControlDiceCard(this));
-                    break;
-                case 5:
-                    this.getCards().add(new CrossingCard(this));
-                    break;
-                case 6:
-                    this.getCards().add(new HaveCard(this));
-                    break;
-                case 7:
-                    this.getCards().add(new ReduceLevelCard(this));
-                    break;
-                case 8:
-                    this.getCards().add(new RobCard(this));
-                    break;
-                case 9:
-                    this.getCards().add(new TallageCard(this));
-                    break;
-                case 10:
-                    this.getCards().add(new TortoiseCard(this));
-                    break;
-                case 11:
-                    this.getCards().add(new TrapCard(this));
-                    break;
-                case 12:
-                    this.getCards().add(new StopCard(this));
-                    break;
-                default:
-                    break;
-            }
-
-        }
+//        for(int i=0;i<2;i++){
+//            int num=(int)(Math.random()*13);
+//            switch(num){
+//                case 0:
+//                case 1:
+//                    this.getCards().add(new AddLevelCard(this));
+//                    break;
+//                case 2:
+//                    this.getCards().add(new AveragerPoorCard(this));
+//                    break;
+//                case 3:
+//                    this.getCards().add(new ChangeCard(this));
+//                    break;
+//                case 4:
+//                    this.getCards().add(new ControlDiceCard(this));
+//                    break;
+//                case 5:
+//                    this.getCards().add(new CrossingCard(this));
+//                    break;
+//                case 6:
+//                    this.getCards().add(new HaveCard(this));
+//                    break;
+//                case 7:
+//                    this.getCards().add(new ReduceLevelCard(this));
+//                    break;
+//                case 8:
+//                    this.getCards().add(new RobCard(this));
+//                    break;
+//                case 9:
+//                    this.getCards().add(new TallageCard(this));
+//                    break;
+//                case 10:
+//                    this.getCards().add(new TortoiseCard(this));
+//                    break;
+//                case 11:
+//                    this.getCards().add(new TrapCard(this));
+//                    break;
+//                case 12:
+//                    this.getCards().add(new StopCard(this));
+//                    break;
+//                default:
+//                    break;
+//            }
+//
+//        }
         //初始化玩家点券数目
         this.setNx(100);
     }

@@ -7,7 +7,7 @@ import java.util.List;
 public class PlayerMessage {
     //玩家编号
     int playernum;
-    //玩家位置
+    //玩家位置,-1代表该玩家出局
     int pos_x;
     int pos_y;
     //玩家的金钱、点券。
@@ -34,6 +34,8 @@ public class PlayerMessage {
                return;
            }
        }
+       this.pos_x=-1;
+       this.pos_y=-1;
     }
     public void setPlayernum(int num){
         this.playernum=num;
