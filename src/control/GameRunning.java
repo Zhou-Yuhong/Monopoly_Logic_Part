@@ -222,6 +222,9 @@ public class GameRunning {
     public int getGame_status(){
         return this.game_status;
     }
+    public void resetGame_status(){
+        this.game_status=0;
+    }
     public void GameContinue(){
         this.game_status=gameContinue();
     }

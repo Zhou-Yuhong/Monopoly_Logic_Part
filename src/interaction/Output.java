@@ -31,6 +31,8 @@ public class Output {
         //把变化置零（无变化）
         control.getRunning().resetChange_type();
         this.game_status=control.getRunning().getGame_status();
+        //把game_status置零
+        control.getRunning().resetGame_status();
     }
     public Output(){
         for(int i=0;i<4;i++){

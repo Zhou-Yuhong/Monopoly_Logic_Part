@@ -34,6 +34,8 @@ public class Main {
                 num=Integer.parseInt(reader.readLine());
                 input.setInput(type,playernum,choice,num);
                 Handler.handle(gamecontrol,input,output);
+
+
                 int jjj=0;
             }
             catch (IOException e){
